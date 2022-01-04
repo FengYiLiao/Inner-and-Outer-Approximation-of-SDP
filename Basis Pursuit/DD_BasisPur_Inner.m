@@ -8,6 +8,7 @@ function  [x,y,info,OBJ]=DD_BasisPur_Inner(A,b,C)
 %C: the coefficient matrix of objective function
 %Sovle in Sedumi dual form
 %y=[x_11,x_12,...,x_nn,a_1,a_2,...,a_n^2]
+    Max_Iter = 200;
     dim_mat = width(C);%dimension of design matirx
     m = length(A);%number of linear constraints
 
@@ -76,19 +77,30 @@ function  [x,y,info,OBJ]=DD_BasisPur_Inner(A,b,C)
     X = y(1:dim_mat^2);%y=[x_11,x_12,...,x_nn,a_1,a_2,...,a_n^2] we only need the first n^2
     X = mat(X);
     CNVG = false;%Convergence or Not
-    %Convergence condition happens when Norm(abs(PreObj-NowObj)) < err
+    %Convergence condition happens when abs((PreObj-NowObj)) < err
     Iter = 1; err = 1.0e-3;
     OBJ = []; OBJ = [OBJ, trace(C*X)];%keep track of Obj Value
     PreX = X ; 
-    epsilon = 0.00001;
-    while ~CNVG
+    epsilon = 0.0001; Count = 0;
+    while ~CNVG 
         D = eig(PreX);
         %since here is inner approximation, the matrix is guaranteed to be PSD
         if (sum(D<0)>0)%address numerical issue
             PreX = PreX + epsilon*eye(dim_mat);
         end
         
-        U = chol(PreX);% naming follows the paper
+%Change here for different decomposition
+%Cholesky Decomposition     
+%        U = chol(PreX);% naming follows the paper
+        
+
+%try different decompostion, which works for PSD matrices
+%Square Root Decomposition
+        [V D]=eig(PreX);
+        Norm = sqrt(sum(V.*V));
+        V = V./(ones(dim_mat,1)*Norm);
+        U = (V*sqrt(D))';
+        
         
         %Cone constraints
         %In each iteration, the only change happens here
@@ -105,9 +117,12 @@ function  [x,y,info,OBJ]=DD_BasisPur_Inner(A,b,C)
         X = mat(X);
         OBJ = [OBJ trace(C*X)];
         %if (trace(eye(dim_mat)*abs((PreX-X)))) < err
-        if  (OBJ(Iter)-OBJ(Iter+1))^2<err
-            CNVG = true;
-            break;
+        if  (OBJ(Iter)-OBJ(Iter+1))^2<err || Iter>=Max_Iter
+            Count = Count +1;
+                if (Count >= 3)
+                    CNVG = true;
+                    break;
+                end
         end
         PreX = X;
         Iter = Iter+1;
