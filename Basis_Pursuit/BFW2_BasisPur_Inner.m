@@ -21,6 +21,7 @@ function [x,y,info,OBJ] = BFW2_BasisPur_Inner(A,b,C,P)
     % combination: 
     CardOfP = length(P);
     Comb = nchoosek(1:CardOfP,2);%block factor-width-2
+    NumOfComb = length(Comb);
     I = eye(dim_mat);
     E = cell(1,CardOfP);
     
@@ -38,6 +39,72 @@ function [x,y,info,OBJ] = BFW2_BasisPur_Inner(A,b,C,P)
     end
     
     U = eye(dim_mat);
+    
+%     %Test
+%         %Outer Approximation
+%         %Solve in Sedumi dual form
+%         b_Out = -vec(C);%minimize
+%         c_Out = b; %linear constraints %will add more later on
+%         K_Out.f = m;
+%         K_Out.s=[];
+% 
+%         %Outer-Linear constraints
+%         At_Out = [];
+%         for i = 1:m% m is number of constraints
+%             At_Out = [At_Out; vec(A{i})'];
+%         end
+% 
+%         %Outer-symmetric constraints
+%         temp = ones(dim_mat);
+%         temp = tril(temp,-1);
+%         idx = find(temp); %index of symmetric element
+%         for i = 1:length(idx)
+%             temp_mat = zeros(dim_mat);
+%             temp_mat(idx(i)) = 1;
+%             temp_mat = temp_mat + (-temp_mat');
+%             At_Out = [At_Out; vec(temp_mat)'];
+%         end
+%         c_Out = [c_Out;zeros(length(idx),1)];%Symmetric Constraints
+% 
+%         K_Out.f = m+length(idx);%Linear Constraints and Symmetric Constraints
+% 
+%         %Outer-Cone constraints
+%         %In each iteration, the only one change happens here
+%         TempAt=[];
+%         count = 0; %count number of variables
+%         for num = 1:NumOfComb
+%             i = Comb(num,1); j = Comb(num,2);
+%             EE = [E{i};E{j}]*U;
+%             tempAt = [];
+%             for r1 = 1: width(EE)
+%                 for r2 =1:width(EE)
+%                     tempAt = [tempAt, -vec(EE(:,r1)*EE(:,r2)')];
+%                 end
+%             end
+%             count = count + height(EE)^2;
+%             K_Out.s = [K_Out.s height(EE)];
+%             TempAt=[TempAt;tempAt];
+%         end    
+%         At_Out = [At_Out;TempAt];
+%         At_Out = At_Out';
+%         c_Out = [c_Out;zeros(count,1)];
+%     
+%         [x_Out,y_Out,info_Out]=sedumi(At_Out,b_Out,c_Out,K_Out);
+%         
+%         %projection
+%         X_Out = mat(y_Out); X_Out = full(X_Out);
+%         [EigVec,EigVal] = eig(X_Out);
+%         EigVal(EigVal<0) = 0;
+%         X_Out = EigVec*EigVal*EigVec';
+%         
+%         [V D]=eig(X_Out); V=real(V);D=real(D);
+%         Norm = sqrt(sum(V.*V));
+%         V = V./(ones(dim_mat,1)*Norm);
+%         U = (V*sqrt(D))'; U=real(U);
+%     %Test
+    
+    
+    
 
     %In each iteration, Objection function and constraints change
     CNVG = false;
