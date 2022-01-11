@@ -6,7 +6,7 @@ dim_mat = 5; %dimension of the symmetric matrix
 
 P=[1 1 2 1]; %partition. Sum(p) = dim_mat
 
-[x_fw2,y_fw2,info_fw2,OBJ_fw2,X_fw2]=BFW2(A,b,C,P);
+[x_fw2,y_fw2,info_fw2,OBJ_fw2,X_fw2]=BFW2(A,b,C,P,eye(dim_mat));
 
 disp(X_fw2);
 

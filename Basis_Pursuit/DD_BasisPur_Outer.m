@@ -53,7 +53,7 @@ function  [x_Out,y_Out,info_Out,OBJ]=DD_BasisPur_Outer(A,b,C)
     
     %start with inner approximation
     %Solve in Sedumi dual form
-    b_In =  [b; zeros(dim_mat^2,1)]; %design variables: y and alphas
+    b_In =  [b; zeros(dim_mat^2,1)]; %decision variables: y and alphas
     c_In = [vec(C);zeros(dim_mat^2,1)];%Linear constraints and nonnegative constraints
     
     %Cone constraints

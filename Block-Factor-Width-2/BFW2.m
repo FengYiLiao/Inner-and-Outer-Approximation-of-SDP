@@ -1,9 +1,10 @@
-function [x,y,info,OBJ,X] = BFW2(A,b,C,P)
+function [x,y,info,OBJ,X] = BFW2(A,b,C,P,U)
 %Solve in Sedumi "Primal" form
 %Input:
 %     A: a cell storing a sequence of symmetric matrices.
 %     b: a column vector.
 %     C: the coefficient matrix of objective function
+%     U: rotation matrix for extreme rays. 
 %Output:
 %     X: decision matrix 
 
@@ -45,10 +46,15 @@ function [x,y,info,OBJ,X] = BFW2(A,b,C,P)
     for n = 1:NumOfComb
         i = Comb(n,1);
         j = Comb(n,2);
-        EE = [ E{i};E{j}];
-        c_new = [c_new;vec(EE*C*EE')];
+        
+        %EE = [ E{i};E{j}];
+        %c_new = [c_new;vec(EE*C*EE')];
+        
+        EE = U'*([E{i};E{j}]');
+        c_new = [c_new;vec(EE'*C*EE)];
+        
         [numRows,numCols] = size(EE);
-        K.s = [K.s numRows];
+        K.s = [K.s numCols];
     end
     
     %constraint
@@ -57,9 +63,15 @@ function [x,y,info,OBJ,X] = BFW2(A,b,C,P)
         for n=1:NumOfComb
             i = Comb(n,1);
             j = Comb(n,2);
-            EE = [ E{i};E{j}]; 
-            [numRows,numCols] = size(EE);
-            temp = [temp;vec(EE*A{k}*EE')];
+            
+%             EE = [ E{i};E{j}]; 
+%             [numRows,numCols] = size(EE);
+%             temp = [temp;vec(EE*A{k}*EE')];
+            
+            
+            EE = U'*([E{i};E{j}]'); 
+            %[numRows,numCols] = size(EE);
+            temp = [temp;vec(EE'*A{k}*EE)];
         end
         At_new = [At_new, temp];
     end 
@@ -72,11 +84,19 @@ function [x,y,info,OBJ,X] = BFW2(A,b,C,P)
     for n = 1:NumOfComb
          i = Comb(n,1);
          j = Comb(n,2);
-         EE = [E{i};E{j}];
+         
+%          EE = [E{i};E{j}];
+%          tempx = x(s:s+K.s(n)^2-1);
+%          tempx = reshape(tempx,[K.s(n) K.s(n)]);
+%          s = s+K.s(n)^2;
+%          X = X + EE'*tempx*EE;
+         
+         
+         EE = U'*([E{i};E{j}]');
          tempx = x(s:s+K.s(n)^2-1);
          tempx = reshape(tempx,[K.s(n) K.s(n)]);
          s = s+K.s(n)^2;
-         X = X + EE'*tempx*EE;
+         X = X + EE*tempx*EE';
     end
     OBJ = trace(C'*X);
 

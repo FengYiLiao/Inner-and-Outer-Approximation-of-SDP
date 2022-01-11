@@ -121,13 +121,13 @@ end
 
 function [x,y,info,NewU] = UpdateU(E,Comb,A,B,U)
 %solve in sedumi dual form
-%Decision variable:[x,y,a,b,c,......]
+%Decision variables:[x,y,a,b,c,......]
 %At=[vec(A) vec(B) vec((u1)(u1)') ...... 
 %    0,0,           I(NumOfVariables in sub-PSD matrices) ]'
 %c= [vec(I(size of A))
 %      0(NumOfVariables in sub-PSD matrices)    ]
 %b=[1,1,0,0,0,.....]
-%Give P=[a1,a2,a3,...]
+%Given P=[a1,a2,a3,...]
 %k.f=SizeOfA k.s=[a1+a2,a2+a3,....]: each element is the dimension of
 %sub-PSD matrix.
     NumOfComb = length(Comb);
